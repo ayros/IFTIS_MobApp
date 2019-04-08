@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/startView"
+            android:padding="@dimen/standard_padding"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/nameView"
+            android:padding="@dimen/standard_padding"
+            android:layout_columnWeight="2"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/typeView"
+            android:padding="@dimen/standard_padding"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/endView"
+            android:padding="@dimen/standard_padding"
+            android:text="TextView"
+            />
+
+        <TextView
+            android:id="@+id/instructorView"
+            android:padding="@dimen/standard_padding"
+            android:layout_columnWeight="2"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/hollView"
+            android:padding="@dimen/standard_padding"
+            android:text="TextView" />
+
+    </GridLayout>
+</merge>

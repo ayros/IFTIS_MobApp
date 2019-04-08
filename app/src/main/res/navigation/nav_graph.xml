@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.ayros.iftis_mobapp.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_loginActivity"
+            app:destination="@id/loginActivity"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/scheduleFragment"
+        android:name="com.ayros.iftis_mobapp.schedule.ScheduleFragment"
+        android:label="fragment_schedule"
+        tools:layout="@layout/fragment_schedule" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.ayros.iftis_mobapp.autorization.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_autorization" />
+    <activity
+        android:id="@+id/registrationActitity"
+        android:name="com.ayros.iftis_mobapp.autorization.RegistrationActitity"
+        android:label="activity_registration_actitity"
+        tools:layout="@layout/activity_registration_actitity" />
+    <action
+        android:id="@+id/action_global_scheduleFragment"
+        app:destination="@id/scheduleFragment" />
+    <action
+        android:id="@+id/action_global_homeFragment"
+        app:destination="@id/homeFragment" />
+
+</navigation>
