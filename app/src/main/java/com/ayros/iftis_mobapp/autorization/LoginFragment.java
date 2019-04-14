@@ -1,24 +1,29 @@
 package com.ayros.iftis_mobapp.autorization;
 
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
-
-import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,18 +35,18 @@ import com.ayros.iftis_mobapp.db.DataBaseAction;
 import com.ayros.iftis_mobapp.model.Student;
 import com.ayros.iftis_mobapp.network.DownloadCallback;
 import com.ayros.iftis_mobapp.network.NetworkFragment;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 
 import androidx.navigation.Navigation;
 
 /**
- * A login screen that offers login via email/password.
+ * A simple {@link Fragment} subclass.
  */
-public class LoginActivity extends AppCompatActivity implements DownloadCallback<String> {
+public class LoginFragment extends DialogFragment implements DownloadCallback<String> {
+
+    public static final String EXTRA_STUDENT = "com.ayros.iftis_mobapp.model.student";
 
     private final static String url = "/autorisation/login";
+    private static final String DIALOG_REGISTRATION = "Registration";
     private NetworkFragment fragment;
 
     // UI references.
@@ -49,17 +54,15 @@ public class LoginActivity extends AppCompatActivity implements DownloadCallback
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
     private Student student;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_autorization);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_login,null);
         // Set up the login form.
-        mLoginView = (EditText) findViewById(R.id.login);
+        mLoginView = (EditText) v.findViewById(R.id.login);
 
-        mPasswordView = (EditText) findViewById(R.id.password_autorization);
+        mPasswordView = (EditText) v.findViewById(R.id.password_autorization);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -71,34 +74,33 @@ public class LoginActivity extends AppCompatActivity implements DownloadCallback
             }
         });
 
-        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
-        mSignInButton.setOnClickListener(new OnClickListener() {
+        Button mSignInButton = (Button) v.findViewById(R.id.sign_in_button);
+        mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
 
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
-        mRegisterButton.setOnClickListener(new OnClickListener() {
+        Button mRegisterButton = (Button) v.findViewById(R.id.register_button);
+        mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LoginActivity.this,RegistrationActitity.class);
-                startActivity(i);
+                FragmentManager manager = getFragmentManager();
+                RegistrationFragment fragment = new RegistrationFragment();
+                fragment.setCancelable(false);
+                fragment.setTargetFragment(getTargetFragment(),getTargetRequestCode());
+                fragment.show(manager,DIALOG_REGISTRATION);
+                getDialog().cancel();
             }
         });
-        mLoginFormView = findViewById(R.id.autorization_form);
-        mProgressView = findViewById(R.id.conncetion_progress);
-        fragment = NetworkFragment.getInstance(getSupportFragmentManager(), getString(R.string.server_url) + url);
+        mLoginFormView = v.findViewById(R.id.autorization_form);
+        mProgressView = v.findViewById(R.id.conncetion_progress);
+        fragment = NetworkFragment.getInstance(getFragmentManager(), getString(R.string.server_url) + url);
+        Dialog dialog= new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.title_activity_login).create();
+        return dialog;
     }
 
-
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
 
         // Reset errors.
@@ -157,9 +159,6 @@ public class LoginActivity extends AppCompatActivity implements DownloadCallback
         return password.length() > 4;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
@@ -194,19 +193,15 @@ public class LoginActivity extends AppCompatActivity implements DownloadCallback
     }
 
     @Override
-    public void onBackPressed(){
-
-    }
-
-    @Override
     public void updateFromDownload(String result) {
         if(result == null){
-            Toast.makeText(getApplicationContext(),"Conncetion Failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"Conncetion Failed", Toast.LENGTH_LONG).show();
             return;
         }
         if(result.equals("Valid")){
             addUser(student);
-            finish();
+            sendResult(Activity.RESULT_OK,student);
+            this.getDialog().cancel();
             return;
         }
         if(result.equals("Invalid")){
@@ -215,14 +210,14 @@ public class LoginActivity extends AppCompatActivity implements DownloadCallback
             return;
         }
         else {
-            Toast.makeText(getApplicationContext(),"Conncetion Failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"Conncetion Failed", Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
     public NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager connectivityManager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo;
     }
@@ -239,9 +234,18 @@ public class LoginActivity extends AppCompatActivity implements DownloadCallback
     }
 
     private void addUser(Student student){
-        DataBaseAction action = new UserInsertAction(getApplicationContext(), student);
-        Data.getInstance(getApplicationContext()).getData(action);
-        Data.getInstance(this).setStudent(student);
+        DataBaseAction action = new UserInsertAction(getContext(), student);
+        Data.getInstance(getContext()).getData(action);
+        Data.getInstance(getContext()).setStudent(student);
+    }
+
+    private void sendResult(int resultCode, Student student){
+        if(getTargetFragment() == null){
+            return;
+        }
+
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_STUDENT,student);
+        getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
     }
 }
-

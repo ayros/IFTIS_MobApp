@@ -15,6 +15,6 @@ public interface NewsDao {
     public List<News> getNews();
 
     @Insert
-    public void insertAll(News... news);
+    public void insertAll(List<News> list);
 
 }

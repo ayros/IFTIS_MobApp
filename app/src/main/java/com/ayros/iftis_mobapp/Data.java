@@ -1,7 +1,6 @@
 package com.ayros.iftis_mobapp;
 
 import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -75,7 +74,7 @@ public class Data {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            action.finised();
+            action.finished();
         }
     }
 }

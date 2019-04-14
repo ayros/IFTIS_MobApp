@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.ayros.iftis_mobapp.Data;
 import com.ayros.iftis_mobapp.R;
@@ -24,10 +25,12 @@ import java.util.ArrayList;
 public class ScheduleDayFragment extends Fragment {
 
     private static final String ARG_DAY_CODE = "day_code";
-    private static final int LESSON_NUMBER = 6;
+    private static final int LESSON_NUMBER = 5;
 
     private ArrayList<Lesson> lessons;
     private ArrayList<LessonView> lessonViews;
+    private TextView weekDay;
+    private TextView weekType;
 
     private Data data;
 
@@ -51,9 +54,9 @@ public class ScheduleDayFragment extends Fragment {
         if (getArguments() != null) {
             day_code = getArguments().getInt(ARG_DAY_CODE);
         }
-        data = Data.getInstance(ScheduleDayFragment.this.getContext());
         lessons = new ArrayList<>(LESSON_NUMBER);
         lessonViews = new ArrayList<>(LESSON_NUMBER);
+        data = Data.getInstance(ScheduleDayFragment.this.getContext());
     }
 
     @Override
@@ -65,10 +68,15 @@ public class ScheduleDayFragment extends Fragment {
         lessonViews.add((LessonView)v.findViewById(R.id.lesson3));
         lessonViews.add((LessonView)v.findViewById(R.id.lesson4));
         lessonViews.add((LessonView)v.findViewById(R.id.lesson5));
-        lessonViews.add((LessonView)v.findViewById(R.id.lesson6));
+
+        weekDay = v.findViewById(R.id.week_day);
+        weekType = v.findViewById(R.id.week_type);
+
 
         DataBaseAction action = new ScheduleDayAction();
         data.getData(action);
+
+        initDay();
 
         return v;
     }
@@ -86,6 +94,12 @@ public class ScheduleDayFragment extends Fragment {
         }
     }
 
+    private void initDay(){
+        Week week = Week.getInstance(getContext());
+        weekDay.setText(week.getDay(day_code));
+        weekType.setText(week.getType(day_code));
+    }
+
     private class ScheduleDayAction implements DataBaseAction{
 
         private ScheduleDao scheduleDao;
@@ -93,13 +107,14 @@ public class ScheduleDayFragment extends Fragment {
         ScheduleDayAction(){
             scheduleDao = data.getDb().scheduleDao();
         }
+
         @Override
         public void findData() {
             lessons.addAll(scheduleDao.getDay(day_code));
         }
 
         @Override
-        public void finised() {
+        public void finished() {
             if(lessons.isEmpty()){
                 return;
             }

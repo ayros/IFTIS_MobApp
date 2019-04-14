@@ -28,7 +28,7 @@ public class UserInsertAction implements DataBaseAction {
     }
 
     @Override
-    public void finised() {
+    public void finished() {
 
     }
 }

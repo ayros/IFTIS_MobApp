@@ -24,24 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 
-public class ScheduleFragment extends Fragment implements DownloadCallback<String> {
-
-    private final static String url = "/schedule/download";
+public class ScheduleFragment extends Fragment{
 
     private ViewPager mViewPager;
-    private NetworkFragment network;
-
-    public ScheduleFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        String address = getString(R.string.server_url)+url;
-        network = NetworkFragment.getInstance(getFragmentManager(),address);
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,52 +44,7 @@ public class ScheduleFragment extends Fragment implements DownloadCallback<Strin
                 return 10;
             }
         });
-        Student student = (Student)getArguments().getSerializable("user");
-        String[] args = {student.getLogin(),student.getPassword()};
-        network.setCallback(this);
-        network.startDownload(args);
         return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void updateFromDownload(String result) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            Schedule[] schedules = mapper.readValue(result, Schedule[].class);
-            ScheduleDataAction action = new ScheduleDataAction(schedules, getActivity());
-            Data.getInstance(getActivity()).getData(action);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mViewPager.setCurrentItem(0);
-    }
-
-    @Override
-    public NetworkInfo getActiveNetworkInfo() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo;
-    }
-
-    @Override
-    public void onProgressUpdate(int progressCode, int percentComplete) {
-
-    }
-
-    @Override
-    public void finishDownloading() {
-
     }
 
 }

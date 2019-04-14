@@ -23,11 +23,12 @@ public class ScheduleDataAction implements DataBaseAction {
     }
     @Override
     public void findData() {
+        dao.deleteAll();
         dao.insert(schedules);
     }
 
     @Override
-    public void finised() {
+    public void finished() {
 
     }
 }

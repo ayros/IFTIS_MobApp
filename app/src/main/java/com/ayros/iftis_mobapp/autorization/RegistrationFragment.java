@@ -1,21 +1,28 @@
 package com.ayros.iftis_mobapp.autorization;
 
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.ayros.iftis_mobapp.Data;
 import com.ayros.iftis_mobapp.R;
@@ -28,9 +35,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 /**
- * A login screen that offers login via email/password.
+ * A simple {@link Fragment} subclass.
  */
-public class RegistrationActitity extends AppCompatActivity implements DownloadCallback<String> {
+public class RegistrationFragment extends DialogFragment implements DownloadCallback<String> {
 
     private final static String url = "/autorisation/registration";
     private final static String INVALID = "INVALID";
@@ -45,36 +52,35 @@ public class RegistrationActitity extends AppCompatActivity implements DownloadC
     private View mRegistrationFormView;
     private Student student;
 
+    public RegistrationFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration_actitity);
-        // Set up the login form.
-        mLoginView = (EditText) findViewById(R.id.email);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_registration,null);
+        // Inflate the layout for this fragment
+        mLoginView = (EditText) v.findViewById(R.id.email);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mGroupView = (EditText) findViewById(R.id.group);
-        mSubgroupView = (EditText) findViewById(R.id.subgroup);
+        mPasswordView = (EditText) v.findViewById(R.id.password);
+        mGroupView = (EditText) v.findViewById(R.id.group);
+        mSubgroupView = (EditText) v.findViewById(R.id.subgroup);
 
-        Button mRegistrationButton = (Button) findViewById(R.id.new_account_button);
-        mRegistrationButton.setOnClickListener(new OnClickListener() {
+        Button mRegistrationButton = (Button) v.findViewById(R.id.new_account_button);
+        mRegistrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
 
-        mRegistrationFormView = findViewById(R.id.registration_form);
-        mProgressView = findViewById(R.id.registration_progress);
-        network = NetworkFragment.getInstance(getSupportFragmentManager(),getString(R.string.server_url)+url);
+        mRegistrationFormView = v.findViewById(R.id.registration_form);
+        mProgressView = v.findViewById(R.id.registration_progress);
+        network = NetworkFragment.getInstance(getFragmentManager(),getString(R.string.server_url)+url);
+        Dialog dialog= new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.title_activity_registration_actitity).create();
+        return dialog;
     }
-
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
 
         // Reset errors.
@@ -190,7 +196,8 @@ public class RegistrationActitity extends AppCompatActivity implements DownloadC
             response = mapper.readValue(result, String[].class);
             if(checkResults(response)){
                 addUser(student);
-                finish();
+                sendResult(Activity.RESULT_OK,student);
+                this.getDialog().cancel();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -201,7 +208,7 @@ public class RegistrationActitity extends AppCompatActivity implements DownloadC
     @Override
     public NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager connectivityManager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo;
     }
@@ -242,9 +249,18 @@ public class RegistrationActitity extends AppCompatActivity implements DownloadC
     }
 
     private void addUser(Student student){
-        DataBaseAction action = new UserInsertAction(getApplicationContext(), student);
-        Data.getInstance(getApplicationContext()).getData(action);
-        Data.getInstance(this).setStudent(student);
+        DataBaseAction action = new UserInsertAction(getContext(), student);
+        Data.getInstance(getContext()).getData(action);
+        Data.getInstance(getContext()).setStudent(student);
+    }
+
+    private void sendResult(int resultCode, Student student){
+        if(getTargetFragment() == null){
+            return;
+        }
+
+        Intent intent = new Intent();
+        intent.putExtra(LoginFragment.EXTRA_STUDENT,student);
+        getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
     }
 }
-

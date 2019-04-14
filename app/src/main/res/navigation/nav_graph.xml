@@ -3,36 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/fillerHomeFragment">
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.ayros.iftis_mobapp.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeFragment_to_loginActivity"
-            app:destination="@id/loginActivity"
-            />
-    </fragment>
+        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/scheduleFragment"
         android:name="com.ayros.iftis_mobapp.schedule.ScheduleFragment"
         android:label="fragment_schedule"
         tools:layout="@layout/fragment_schedule" />
-    <activity
-        android:id="@+id/loginActivity"
-        android:name="com.ayros.iftis_mobapp.autorization.LoginActivity"
-        android:label="activity_login"
-        tools:layout="@layout/activity_autorization" />
-    <activity
-        android:id="@+id/registrationActitity"
-        android:name="com.ayros.iftis_mobapp.autorization.RegistrationActitity"
-        android:label="activity_registration_actitity"
-        tools:layout="@layout/activity_registration_actitity" />
     <action
         android:id="@+id/action_global_scheduleFragment"
-        app:destination="@id/scheduleFragment" />
+        app:destination="@id/scheduleFragment"
+        />
+    <fragment
+        android:id="@+id/fillerHomeFragment"
+        android:name="com.ayros.iftis_mobapp.FillerHomeFragment"
+        android:label="fragment_filler_home"
+        tools:layout="@layout/fragment_filler_home" >
+        <action
+            android:id="@+id/action_fillerHomeFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            />
+    </fragment>
     <action
         android:id="@+id/action_global_homeFragment"
         app:destination="@id/homeFragment" />

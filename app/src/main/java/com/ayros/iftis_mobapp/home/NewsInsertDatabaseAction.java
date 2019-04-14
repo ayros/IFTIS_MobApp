@@ -10,12 +10,12 @@ import java.util.List;
 public class NewsInsertDatabaseAction extends NewsDataBaseAction {
 
 
-    public NewsInsertDatabaseAction(Context context, DatabaseCallback callback,News... news) {
+    public NewsInsertDatabaseAction(Context context, DatabaseCallback callback,List<News> news) {
         super(context, callback);
-        setNews(news);
+        this.news = news;
     }
 
     public void findData(){
-        dao.insertAll(getNews());
+        dao.insertAll(news);
     }
 }

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ayros.iftis_mobapp.Data;
 import com.ayros.iftis_mobapp.R;
@@ -29,11 +30,9 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class HomeFragment extends Fragment implements DatabaseCallback<News>, DownloadCallback<String> {
-    // the fragment initialization parameters
+public class HomeFragment extends Fragment implements DatabaseCallback<News> {
+
     private static final String ARG_STUDENT = "user";
-    private static final String URL_UPDATE = "/news/get_update";
-    private static final String URL_DOWNLOAD = "/news/create";
 
     private Student mStudent;
     private List<News> news;
@@ -42,13 +41,6 @@ public class HomeFragment extends Fragment implements DatabaseCallback<News>, Do
     private NewsAdapter mAdapter;
     private SimpleDateFormat spf;
 
-    private NetworkFragment network;
-
-
-
-    public HomeFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,20 +49,8 @@ public class HomeFragment extends Fragment implements DatabaseCallback<News>, Do
             mStudent = (Student)getArguments().getSerializable(ARG_STUDENT);
         }
         news = new ArrayList<>();
-        if(mStudent != null){
-            updateDb();
-            if(news.isEmpty()){
-                network = NetworkFragment.getInstance(getFragmentManager(), getString(R.string.server_url)+URL_DOWNLOAD);
-                network.setCallback(this);
-                network.startDownload("");
-            }
-            else {
-                network = NetworkFragment.getInstance(getFragmentManager(), getString(R.string.server_url)+URL_UPDATE);
-                network.setCallback(this);
-                network.startDownload(news.get(news.size()-1).getTime());
-            }
-        }
-        spf = new SimpleDateFormat("dd MMM yy hh:mm");
+        updateDb();
+        spf = new SimpleDateFormat("dd MMM HH:mm");
     }
 
     @Override
@@ -89,6 +69,7 @@ public class HomeFragment extends Fragment implements DatabaseCallback<News>, Do
         super.onAttach(context);
 
     }
+
     private void updateUI(){
         mAdapter = new NewsAdapter(news);
         mNewsRecyclerView.setAdapter(mAdapter);
@@ -100,41 +81,9 @@ public class HomeFragment extends Fragment implements DatabaseCallback<News>, Do
     }
 
     @Override
-    public void finished(News... news) {
-        for (News n: news){
-            this.news.add(n);
-        }
+    public void finished(List<News> news) {
+        this.news.addAll(news);
         updateUI();
-    }
-
-    @Override
-    public void updateFromDownload(String result) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            News[] arr = mapper.readValue(result,News[].class);
-            news = Arrays.asList(arr);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        updateUI();
-    }
-
-    @Override
-    public NetworkInfo getActiveNetworkInfo() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo;
-    }
-
-    @Override
-    public void onProgressUpdate(int progressCode, int percentComplete) {
-
-    }
-
-    @Override
-    public void finishDownloading() {
-
     }
 
     public class NewsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

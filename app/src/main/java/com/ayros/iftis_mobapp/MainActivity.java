@@ -62,43 +62,5 @@ public class MainActivity extends AppCompatActivity {
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
-        DataBaseAction action = new DataBaseAction() {
-            private Student student;
-            @Override
-            public void findData() {
-                UserDao dao = Data.getInstance(getApplicationContext()).getUserDao();
-                student = dao.getFirst();
-            }
-
-            @Override
-            public void finised() {
-                dataBaseResult(student);
-            }
-        };
-
-        Data.getInstance(getApplicationContext()).getData(action);
-
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(user == null){
-            user = Data.getInstance(this).getStudent();
-        }
-    }
-
-    private void dataBaseResult(Student student){
-        if(student == null){
-            navController.navigate(R.id.action_homeFragment_to_loginActivity);
-        }
-        else {
-            this.user = student;
-        }
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
     }
 }

@@ -5,5 +5,5 @@ public interface DataBaseAction {
 
     public void findData();
 
-    public void finised();
+    public void finished();
 }

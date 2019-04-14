@@ -9,7 +9,7 @@ import java.util.Date;
 public class News {
 
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     private int mId;
     private String title;
     private Date time;

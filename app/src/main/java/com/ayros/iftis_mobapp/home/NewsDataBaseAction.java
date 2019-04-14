@@ -14,7 +14,7 @@ import java.util.List;
 public class NewsDataBaseAction implements DataBaseAction {
 
     protected NewsDao dao;
-    private News[] news;
+    protected List<News> news;
     private DatabaseCallback callback;
 
     public NewsDataBaseAction(Context context, DatabaseCallback callback){
@@ -24,21 +24,19 @@ public class NewsDataBaseAction implements DataBaseAction {
 
     @Override
     public void findData() {
-        List<News> list = dao.getNews();
-        news = new News[list.size()];
-        news = list.toArray(news);
+        news = dao.getNews();
     }
 
     @Override
-    public void finised() {
-        //callback.finished();
+    public void finished() {
+        callback.finished(news);
     }
 
-    public News[] getNews() {
+    public List<News> getNews() {
         return news;
     }
 
-    public void setNews(News[] news) {
+    public void setNews(List<News> news) {
         this.news = news;
     }
 }
